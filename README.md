@@ -11,3 +11,5 @@ $ npm install -g local-web-server
 $ ws
 ```
 Navigate to http://localhost:8000 (default port: 8000)
+
+#### [Try Now](http://mzmsh.github.io/try-web-worker/)
