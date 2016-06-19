@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Try Web Worker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Try Web-Worker</h1>
+    <div>
+        Time to process (sec)
+        <input type="number" id="seconds" value="3">
+    </div>
+    <input type="button" id="start" value="Start!">
+    <p>
+        <div>Elapsed time: <span id="elapsed">-</span></div>
+        <div>Progress: <em id="progress">-</span></div>
+    </p>
+    <p>
+        <p>LOG:</p>
+        <div id="log"></div>
+    </p>
+
+    <script src="jquery.js" type="text/javascript"></script>
+    <script>
+        $(function() {
+            var w;
+            var logEl = $('#log'),
+            startEl = $('#start'),
+            progressEl = $('#progress'),
+            secondsEl = $('#seconds'),
+            elapsedEl = $('#elapsed'),
+            elapsedTimer;
+
+            startEl.click(function() {
+                initMyWorker();
+                
+                logEl.html('');
+                progressEl.html('');
+                
+                var t = parseInt(secondsEl.val());
+                startTimer();
+                w.postMessage(t);
+            });
+            
+            function initMyWorker(){
+                w = new Worker('my-worker.js');
+                w.onmessage = onWorkerMessage;
+                w.onerror = onWorkerError;
+            }
+            
+            function onWorkerMessage(message) {
+                var data = message.data;
+                if(data.inProgress){
+                    progressEl.text(data.progress + '%');
+                }else{
+                    logEl.html(data.result);
+                    stopTimer();                 
+                }
+            }
+            
+            function onWorkerError(e) {
+                logEl.html(e.message);
+            }
+            
+            function startTimer(){
+                elapsedEl.text('');
+                var started = new Date().getTime();
+                elapsedTimer = setInterval(function(){
+                    var diff = new Date().getTime() - started;
+                    elapsedEl.text(diff/1000+' s');
+                }, 100);
+            }
+            
+            function stopTimer(){
+                clearInterval(elapsedTimer);
+            }
+
+
+        });
+    </script>
+</body>
+
+</html>
